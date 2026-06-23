@@ -7,4 +7,18 @@ _apps = [
     ack_ecr.data,
 ]
 
-items = [blueprints.build_helm_app(app) for app in _apps]
+_project = blueprints.build_project(
+    name="platform-base"
+    description="Platform Engineering - Base Infrastructure (KRO + ACK)"
+    annotations={}
+    sourceRepos=[app.repo for app in _apps]
+    destination_name="in-cluster"
+    destination_namespaces=[app.namespace for app in _apps]
+    clusterResourceWhitelist=[
+        {group = "*", kind = "*"}
+    ]
+)
+
+_helm_apps = [blueprints.build_helm_app(app, project=_project.metadata.name) for app in _apps]
+
+items = [_project] + _helm_apps

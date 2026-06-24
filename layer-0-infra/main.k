@@ -11,9 +11,9 @@ _project = blueprints.build_project(
     name="platform-base"
     description="Platform Engineering - Base Infrastructure (KRO + ACK)"
     annotations={}
-    sourceRepos=[app.repo for app in _apps]
+    sourceRepos=[app.repo for app in _apps] + ["https://github.com/segoja7/platform-engineering-from-scratch"]
     destination_name="in-cluster"
-    destination_namespaces=[app.namespace for app in _apps]
+    destination_namespaces=[app.namespace for app in _apps] + ["default"]
     clusterResourceWhitelist=[
         {group = "*", kind = "*"}
     ]
@@ -21,4 +21,29 @@ _project = blueprints.build_project(
 
 _helm_apps = [blueprints.build_helm_app(app, project=_project.metadata.name) for app in _apps]
 
-items = [_project] + _helm_apps
+_layer1_app = blueprints.ApplicationBlueprint {
+    _metadataName = "layer-1-services"
+    _namespace = "argocd"
+    _destination = {
+        name = "in-cluster"
+        namespace = "default"
+    }
+    _project = _project.metadata.name
+    _source = {
+        repoURL = "https://github.com/segoja7/platform-engineering-from-scratch"
+        targetRevision = "main"
+        path = "layer-1-services"
+        plugin = {}
+    }
+    _syncPolicy = {
+        automated = {
+            prune = True
+            selfHeal = True
+        }
+        syncOptions = [
+            "CreateNamespace=true"
+        ]
+    }
+}
+
+items = [_project] + _helm_apps + [_layer1_app]

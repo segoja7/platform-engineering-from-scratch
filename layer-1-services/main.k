@@ -8,7 +8,7 @@ items = [blueprints.ResourcegraphdefinitionBlueprint {
         group = "kro.run"
         spec = {
             name = "string | required=true"
-            imageTagMutability = r"""string | default="IMMUTABLE" """
+            imageTagMutability = 'string | default="IMMUTABLE"'
             scanOnPush = "boolean | default=true"
         }
         status = {

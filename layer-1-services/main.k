@@ -1,6 +1,6 @@
 import blueprints
 
-blueprints.ResourcegraphdefinitionBlueprint {
+items = [blueprints.ResourcegraphdefinitionBlueprint {
     _metadataName = "ecr-repository"
     _schema = {
         apiVersion = "v1alpha1"
@@ -45,4 +45,4 @@ blueprints.ResourcegraphdefinitionBlueprint {
             ]
         }
     ]
-}
+}]

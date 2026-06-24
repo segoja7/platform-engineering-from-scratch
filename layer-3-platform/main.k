@@ -1,0 +1,13 @@
+items = [
+    {
+        apiVersion = "kro.run/v1alpha1"
+        kind = "ECRRepository"
+        metadata = {
+            name = "kcl-modules"
+            namespace = "default"
+        }
+        spec = {
+            name = "kcl-modules"
+        }
+    }
+]

@@ -46,4 +46,41 @@ _layer1_app = blueprints.ApplicationBlueprint {
     }
 }
 
-items = [_project] + _helm_apps + [_layer1_app]
+_platform_project = blueprints.build_project(
+    name="platform-apis"
+    description="Platform APIs - Claims that consume infrastructure services"
+    annotations={}
+    sourceRepos=["https://github.com/segoja7/platform-engineering-from-scratch"]
+    destination_name="in-cluster"
+    destination_namespaces=["default"]
+    clusterResourceWhitelist=[
+        {group = "kro.run", kind = "*"}
+    ]
+)
+
+_layer3_app = blueprints.ApplicationBlueprint {
+    _metadataName = "layer-3-platform"
+    _namespace = "argocd"
+    _destination = {
+        name = "in-cluster"
+        namespace = "default"
+    }
+    _project = _platform_project.metadata.name
+    _source = {
+        repoURL = "https://github.com/segoja7/platform-engineering-from-scratch"
+        targetRevision = "main"
+        path = "layer-3-platform"
+        plugin = {}
+    }
+    _syncPolicy = {
+        automated = {
+            prune = True
+            selfHeal = True
+        }
+        syncOptions = [
+            "CreateNamespace=true"
+        ]
+    }
+}
+
+items = [_project, _platform_project] + _helm_apps + [_layer1_app, _layer3_app]

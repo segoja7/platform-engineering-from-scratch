@@ -1,0 +1,9 @@
+[dependencies]
+  [dependencies.kcl_helm_library]
+    name = "kcl_helm_library"
+    full_name = "kcl_helm_library_0.0.1"
+    version = "0.0.1"
+    sum = "R9VtDvPixU9Qfdn+z8NYAAIV2YLGX8kelEHPfj4AM+8="
+    reg = "ghcr.io"
+    repo = "segoja7/kcl_helm_library"
+    oci_tag = "0.0.1"

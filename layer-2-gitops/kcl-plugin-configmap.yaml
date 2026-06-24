@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kcl-plugin
+  namespace: argocd
+data:
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: kcl
+    spec:
+      version: v1.0
+      discover:
+        find:
+          glob: "**/kcl.mod"
+      generate:
+        command: ["sh", "-c"]
+        args:
+          - |
+            export KCL_CACHE_PATH=/tmp
+            export KCL_PKG_PATH=/tmp
+            kcl run -S items -q 2>&1

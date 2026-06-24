@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+  namespace: argocd
+spec:
+  template:
+    spec:
+      volumes:
+        - name: kcl-binary
+          emptyDir: {}
+        - name: kcl-plugin-config
+          configMap:
+            name: kcl-plugin
+      initContainers:
+        - name: install-kcl
+          image: kcllang/kcl:v0.12.3
+          command:
+            - sh
+            - -c
+            - cp /usr/local/bin/kcl /kcl-binary/
+          volumeMounts:
+            - name: kcl-binary
+              mountPath: /kcl-binary
+      containers:
+        - name: kcl-plugin
+          command:
+            - /var/run/argocd/argocd-cmp-server
+          image: quay.io/argoproj/argocd:v2.14.9
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+          volumeMounts:
+            - mountPath: /var/run/argocd
+              name: var-files
+            - mountPath: /home/argocd/cmp-server/plugins
+              name: plugins
+            - mountPath: /usr/local/bin/kcl
+              name: kcl-binary
+              subPath: kcl
+            - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+              name: kcl-plugin-config
+              subPath: plugin.yaml

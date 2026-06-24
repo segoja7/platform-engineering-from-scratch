@@ -40,9 +40,6 @@ items = [blueprints.ResourcegraphdefinitionBlueprint {
                     ]
                 }
             }
-            readyWhen = [
-                "self.status.repositoryURI != ''"
-            ]
         }
     ]
 }]

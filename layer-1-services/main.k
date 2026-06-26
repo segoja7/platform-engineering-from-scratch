@@ -1,6 +1,7 @@
 import blueprints
+import eks
 
-items = [blueprints.ResourcegraphdefinitionBlueprint {
+items = [eks.rgd, blueprints.ResourcegraphdefinitionBlueprint {
     _metadataName = "ecr-repository"
     _schema = {
         apiVersion = "v1alpha1"

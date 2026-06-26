@@ -1,2 +1,5 @@
 .kclvm/
 .kcl/
+
+# Local-only notes, not for the repo
+ROADMAP.md

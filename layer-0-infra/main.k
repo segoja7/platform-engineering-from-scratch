@@ -1,10 +1,14 @@
 import kcl_helm_library.blueprints
 import registry.kro
 import registry.ack_ecr
+import registry.ack_iam
+import registry.ack_eks
 
 _apps = [
     kro.data,
     ack_ecr.data,
+    ack_iam.data,
+    ack_eks.data,
 ]
 
 _project = blueprints.build_project(

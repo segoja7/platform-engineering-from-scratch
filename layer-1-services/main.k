@@ -1,6 +1,6 @@
 import blueprints
-import eks
-import vpc
+import rgds.eks
+import rgds.vpc
 
 items = [vpc.rgd, eks.rgd, blueprints.ResourcegraphdefinitionBlueprint {
     _metadataName = "ecr-repository"

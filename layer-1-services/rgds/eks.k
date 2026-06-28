@@ -62,8 +62,8 @@ _addons = [
 
 # Reference the VPCNetwork's private subnets by k8s name; ACK fills in the IDs.
 _privateSubnetRefs = [
-    {from = {name = r"${schema.spec.networkName}-privateSubnet1"}}
-    {from = {name = r"${schema.spec.networkName}-privateSubnet2"}}
+    {from = {name = r"${schema.spec.networkName}-private-subnet-1"}}
+    {from = {name = r"${schema.spec.networkName}-private-subnet-2"}}
 ]
 
 rgd = blueprints.ResourcegraphdefinitionBlueprint {

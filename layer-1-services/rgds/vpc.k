@@ -13,7 +13,9 @@ import blueprints
 # Field names verified with `amdf generate <crd>.ec2.services.k8s.aws`.
 
 # Subnet -> route-table association lives on the subnet (spec.routeTables = IDs).
-_subnet = lambda id: str, azField: str, cidrField: str, public: bool, rtId: str -> {str:} {
+# id is the KRO graph id (camelCase, used in ${...} refs); name is the k8s
+# object name and MUST be RFC-1123 lowercase, so it is passed separately.
+_subnet = lambda id: str, name: str, azField: str, cidrField: str, public: bool, rtId: str -> {str:} {
     _roleTag = {key = "kubernetes.io/role/elb", value = "1"} if public else \
                {key = "kubernetes.io/role/internal-elb", value = "1"}
     {
@@ -21,7 +23,7 @@ _subnet = lambda id: str, azField: str, cidrField: str, public: bool, rtId: str 
         template = {
             apiVersion = "ec2.services.k8s.aws/v1alpha1"
             kind = "Subnet"
-            metadata.name = r"${schema.spec.name}-" + id
+            metadata.name = r"${schema.spec.name}-" + name
             spec = {
                 vpcID = r"${vpc.status.vpcID}"
                 cidrBlock = r"${schema.spec." + cidrField + r"}"
@@ -29,7 +31,7 @@ _subnet = lambda id: str, azField: str, cidrField: str, public: bool, rtId: str 
                 mapPublicIPOnLaunch = public
                 routeTables = [rtId]
                 tags = [
-                    {key = "Name", value = r"${schema.spec.name}-" + id}
+                    {key = "Name", value = r"${schema.spec.name}-" + name}
                     _roleTag
                 ]
             }
@@ -135,10 +137,10 @@ rgd = blueprints.ResourcegraphdefinitionBlueprint {
                 }
             }
         }
-        _subnet("publicSubnet1", "az1", "publicSubnet1CIDR", True, r"${publicRouteTable.status.routeTableID}")
-        _subnet("publicSubnet2", "az2", "publicSubnet2CIDR", True, r"${publicRouteTable.status.routeTableID}")
-        _subnet("privateSubnet1", "az1", "privateSubnet1CIDR", False, r"${privateRouteTable.status.routeTableID}")
-        _subnet("privateSubnet2", "az2", "privateSubnet2CIDR", False, r"${privateRouteTable.status.routeTableID}")
+        _subnet("publicSubnet1", "public-subnet-1", "az1", "publicSubnet1CIDR", True, r"${publicRouteTable.status.routeTableID}")
+        _subnet("publicSubnet2", "public-subnet-2", "az2", "publicSubnet2CIDR", True, r"${publicRouteTable.status.routeTableID}")
+        _subnet("privateSubnet1", "private-subnet-1", "az1", "privateSubnet1CIDR", False, r"${privateRouteTable.status.routeTableID}")
+        _subnet("privateSubnet2", "private-subnet-2", "az2", "privateSubnet2CIDR", False, r"${privateRouteTable.status.routeTableID}")
         {
             id = "natGateway"
             template = {

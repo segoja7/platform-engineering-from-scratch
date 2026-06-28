@@ -8,10 +8,13 @@ import blueprints
 # ponytail: minimal Hub cluster only. Deferred to Part 3 (hub-spoke):
 #   KMS encryption, OIDC provider, security-group creation, VPC-CNI IRSA,
 #   ArgoCD IRSA roles + spoke cluster secrets, the ArgoCD helm release.
-# subnetIDs are an input (no VPC layer yet) — the claim passes real subnet IDs.
 #
-# ponytail: ACK field names are best-effort. Validate once controllers are up:
-#   kubectl explain cluster.spec --api-version=eks.services.k8s.aws/v1alpha1
+# Subnets come from the VPCNetwork RGD by reference, not by ID: ACK resolves
+# subnetRefs -> the live status.subnetID of the Subnet objects that VPCNetwork
+# created (named <networkName>-privateSubnetN), re-resolving on any change. So
+# the API takes only networkName; no manual subnet-ID copy, self-healing.
+#
+# Field names verified with `amdf generate <crd>.{eks,iam}.services.k8s.aws`.
 
 _cluster_assume_role = json.encode({
     Version = "2012-10-17"
@@ -57,6 +60,12 @@ _addons = [
     _addon("addonKubeProxy", "kube-proxy")
 ]
 
+# Reference the VPCNetwork's private subnets by k8s name; ACK fills in the IDs.
+_privateSubnetRefs = [
+    {from = {name = r"${schema.spec.networkName}-privateSubnet1"}}
+    {from = {name = r"${schema.spec.networkName}-privateSubnet2"}}
+]
+
 rgd = blueprints.ResourcegraphdefinitionBlueprint {
     _metadataName = "eks-cluster"
     _schema = {
@@ -66,7 +75,7 @@ rgd = blueprints.ResourcegraphdefinitionBlueprint {
         spec = {
             name = "string | required=true"
             version = 'string | default="1.33"'
-            subnetIDs = "[]string"
+            networkName = "string | required=true"
             amiType = 'string | default="BOTTLEROCKET_x86_64"'
             capacityType = 'string | default="ON_DEMAND"'
             diskSize = "integer | default=20"
@@ -131,7 +140,7 @@ rgd = blueprints.ResourcegraphdefinitionBlueprint {
                         bootstrapClusterCreatorAdminPermissions = True
                     }
                     resourcesVPCConfig = {
-                        subnetIDs = r"${schema.spec.subnetIDs}"
+                        subnetRefs = _privateSubnetRefs
                         endpointPublicAccess = r"${schema.spec.endpointPublicAccess}"
                         endpointPrivateAccess = r"${schema.spec.endpointPrivateAccess}"
                     }
@@ -152,7 +161,7 @@ rgd = blueprints.ResourcegraphdefinitionBlueprint {
                     name = r"${schema.spec.name}-ng"
                     clusterName = r"${cluster.spec.name}"
                     nodeRole = r"${nodeRole.status.ackResourceMetadata.arn}"
-                    subnets = r"${schema.spec.subnetIDs}"
+                    subnetRefs = _privateSubnetRefs
                     amiType = r"${schema.spec.amiType}"
                     capacityType = r"${schema.spec.capacityType}"
                     diskSize = r"${schema.spec.diskSize}"

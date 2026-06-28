@@ -3,12 +3,14 @@ import registry.kro
 import registry.ack_ecr
 import registry.ack_iam
 import registry.ack_eks
+import registry.ack_ec2
 
 _apps = [
     kro.data,
     ack_ecr.data,
     ack_iam.data,
     ack_eks.data,
+    ack_ec2.data,
 ]
 
 _project = blueprints.build_project(

@@ -1,7 +1,8 @@
 import blueprints
 import eks
+import vpc
 
-items = [eks.rgd, blueprints.ResourcegraphdefinitionBlueprint {
+items = [vpc.rgd, eks.rgd, blueprints.ResourcegraphdefinitionBlueprint {
     _metadataName = "ecr-repository"
     _schema = {
         apiVersion = "v1alpha1"

@@ -74,7 +74,7 @@ rgd = blueprints.ResourcegraphdefinitionBlueprint {
         group = "kro.run"
         spec = {
             name = "string | required=true"
-            version = 'string | default="1.33"'
+            version = 'string | default="1.36"'
             networkName = "string | required=true"
             amiType = 'string | default="BOTTLEROCKET_x86_64"'
             capacityType = 'string | default="ON_DEMAND"'

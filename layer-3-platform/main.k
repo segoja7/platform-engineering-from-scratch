@@ -38,7 +38,7 @@ items = [
         }
         spec = {
             name = "hub"
-            version = "1.33"
+            version = "1.36"
             networkName = "hub"
             amiType = "BOTTLEROCKET_x86_64"
             capacityType = "ON_DEMAND"
